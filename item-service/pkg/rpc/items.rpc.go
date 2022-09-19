@@ -10,7 +10,7 @@ import (
 
 type ItemService interface {
 	AddItem(models.Items, *config.JSONResponse) error
-	GetItem()
+	GetItem(string, *config.JSONResponse) error
 	UpdateItem()
 	DeleteItem()
 }
@@ -35,7 +35,16 @@ func (c *ItemCollection) AddItem(item models.Items, result *config.JSONResponse)
 	return nil
 }
 
-func (c *ItemCollection) GetItem() {}
+func (c *ItemCollection) GetItem(id string, result *config.JSONResponse) error {
+	var item models.ItemModel
+	err := c.services.GetItem(id).Decode(&item)
+	if err != nil {
+		return err
+	}
+	result.Message = fmt.Sprintf("item with id %v fetched.", id)
+	result.Data = item
+	return nil
+}
 
 func (c *ItemCollection) UpdateItem() {}
 
