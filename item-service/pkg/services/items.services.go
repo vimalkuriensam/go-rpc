@@ -47,7 +47,16 @@ func (s *itemService) GetItem(id string) *mongo.SingleResult {
 }
 
 func (s *itemService) UpdateItem(id string, item models.Items) (*mongo.UpdateResult, error) {
-	return nil, nil
+	docId, _ := primitive.ObjectIDFromHex(id)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancelFunc()
+	return s.collection.UpdateByID(ctx, docId, bson.D{
+		primitive.E{Key: "$set", Value: bson.D{
+			primitive.E{Key: "name", Value: item.Name},
+			primitive.E{Key: "value", Value: item.Value},
+			primitive.E{Key: "update_at", Value: time.Now()},
+		}},
+	})
 }
 
 func (s *itemService) DeleteItem(id string) (*mongo.DeleteResult, error) {
