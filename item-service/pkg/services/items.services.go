@@ -6,6 +6,7 @@ import (
 
 	"github.com/vimalkuriensam/item-service/pkg/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -39,7 +40,10 @@ func (s *itemService) InsertItem(item models.Items) (*mongo.InsertOneResult, err
 }
 
 func (s *itemService) GetItem(id string) *mongo.SingleResult {
-	return nil
+	docId, _ := primitive.ObjectIDFromHex(id)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancelFunc()
+	return s.collection.FindOne(ctx, bson.M{"_id": docId})
 }
 
 func (s *itemService) UpdateItem(id string, item models.Items) (*mongo.UpdateResult, error) {
