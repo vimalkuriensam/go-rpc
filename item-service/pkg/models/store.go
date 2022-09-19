@@ -11,8 +11,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type ItemModel interface {
+	Connect() error
+	Disconnect()
+	InsertMongoCollections(...string)
+}
+
 type itemModel struct {
 	config *config.Config
+}
+
+func Init() ItemModel {
+	return &itemModel{
+		config: config.GetConfig(),
+	}
 }
 
 func (m *itemModel) Connect() error {
@@ -39,6 +51,7 @@ func (m *itemModel) Connect() error {
 			time.Sleep(time.Duration(math.Pow(float64(attempts), 2)) * time.Second)
 			continue
 		}
+		m.config.Logger.Printf("Db connected in %d attempts\n", attempts)
 		m.config.Database.Client = client
 		break
 	}

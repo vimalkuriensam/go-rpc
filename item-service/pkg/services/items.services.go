@@ -1,7 +1,11 @@
 package services
 
 import (
+	"context"
+	"time"
+
 	"github.com/vimalkuriensam/item-service/pkg/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -23,7 +27,15 @@ func New(collection *mongo.Collection) ItemService {
 }
 
 func (s *itemService) InsertItem(item models.Items) (*mongo.InsertOneResult, error) {
-	return nil, nil
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancelFunc()
+	newItem := bson.D{
+		{Key: "name", Value: item.Name},
+		{Key: "value", Value: item.Value},
+		{Key: "created_at", Value: time.Now()},
+		{Key: "updated_at", Value: time.Now()},
+	}
+	return s.collection.InsertOne(ctx, newItem)
 }
 
 func (s *itemService) GetItem(id string) *mongo.SingleResult {

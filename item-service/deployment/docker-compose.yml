@@ -10,9 +10,13 @@ services:
     env_file:
       - ../environment/production.env
     restart: always
+    ports:
+      - 8080:80
     deploy:
       mode: replicated
       replicas: 1
+    depends_on:
+      - mongo-service
   mongo-service:
     image: mongo:latest
     container_name: mongodb
