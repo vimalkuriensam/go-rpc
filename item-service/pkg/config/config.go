@@ -15,11 +15,17 @@ type Config struct {
 	Env      map[string]any
 	Database *Database
 	Logger   *log.Logger
+	Response *JSONResponse
 }
 
 type Database struct {
 	Client      *mongo.Client
 	Collections map[string]*mongo.Collection
+}
+
+type JSONResponse struct {
+	Message string `json:"message"`
+	Data    any    `json:"data"`
 }
 
 var cfg *Config
@@ -30,7 +36,8 @@ func Initialize() *Config {
 		Database: &Database{
 			Collections: make(map[string]*mongo.Collection),
 		},
-		Logger: log.New(os.Stdout, "", log.Ldate|log.Ltime),
+		Logger:   log.New(os.Stdout, "", log.Ldate|log.Ltime),
+		Response: &JSONResponse{},
 	}
 	return cfg
 }
