@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  items-service:
+    user: 10001:10001
+    build: 
+      context: ../
+      dockerfile: ./deployment/Dockerfile.prod
+    command:
+      - -envflag=production
+    env_file:
+      - ../environment/production.env
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+  mongo-service:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - ./db-data/mongo/:/data/db/
+    env_file:
+      - ../environment/mongo.env
+    ports:
+      - 27017:27017
+    restart: always
+    
