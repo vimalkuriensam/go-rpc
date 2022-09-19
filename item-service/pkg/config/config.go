@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,9 +14,11 @@ import (
 type Config struct {
 	Env      map[string]any
 	Database *Database
+	Logger   *log.Logger
 }
 
 type Database struct {
+	Client      *mongo.Client
 	Collections map[string]*mongo.Collection
 }
 
@@ -27,6 +30,7 @@ func Initialize() *Config {
 		Database: &Database{
 			Collections: make(map[string]*mongo.Collection),
 		},
+		Logger: log.New(os.Stdout, "", log.Ldate|log.Ltime),
 	}
 	return cfg
 }
