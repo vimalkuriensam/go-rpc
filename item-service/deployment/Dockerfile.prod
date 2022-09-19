@@ -1,0 +1,30 @@
+# creating a multistage docker file
+# Initial stage being the builder stage
+FROM golang:alpine as BUILDER-STAGE
+RUN apk update && add --no-cache git ca-certificates tz-data && update-ca-certificates
+ENV USER=appuser
+ENV UID=10001
+WORKDIR /app
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "nonexistent" \
+    --shell "/sbin/nologin" \
+    --uid "${UID}" \
+    "${USER}"
+COPY go.mod go.sum /app/
+RUN go mod download
+RUN go mod verify
+COPY . /app/
+RUN CGO_ENABLED=0 go build -o /app/itemServiceApp ./cmd/api/*.go
+RUN chmod +x /app/itemServiceApp
+# Second stage build file deployer stage  
+# for running the application
+FROM scratch as DEPLOYER-STAGE
+WORKDIR /app
+COPY --from=BUILDER-STAGE /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=BUILDER-STAGE /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=BUIDER-STAGE /app/itemServiceApp /app/
+USER appuser:appuser
+EXPOSE 80
+ENTRYPOINT ["/app/itemServiceApp"]

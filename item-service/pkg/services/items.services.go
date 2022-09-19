@@ -12,22 +12,22 @@ type ItemService interface {
 	DeleteItem()
 }
 
-type itemService struct {
+type ItemCollection struct {
 	collection *mongo.Collection
 }
 
 func New(collection *mongo.Collection) ItemService {
-	return &itemService{
+	return &ItemCollection{
 		collection: collection,
 	}
 }
 
-func (item *itemService) AddItem(i models.Items, result *models.Items) error {
+func (c *ItemCollection) AddItem(item models.Items, result *models.Items) error {
 	return nil
 }
 
-func (item *itemService) GetItem() {}
+func (c *ItemCollection) GetItem() {}
 
-func (item *itemService) UpdateItem() {}
+func (c *ItemCollection) UpdateItem() {}
 
-func (item *itemService) DeleteItem() {}
+func (c *ItemCollection) DeleteItem() {}
