@@ -6,28 +6,34 @@ import (
 )
 
 type ItemService interface {
-	AddItem(models.Items, *models.Items) error
-	GetItem()
-	UpdateItem()
-	DeleteItem()
+	InsertItem(models.Items) (*mongo.InsertOneResult, error)
+	GetItem(string) *mongo.SingleResult
+	UpdateItem(string, models.Items) (*mongo.UpdateResult, error)
+	DeleteItem(string) (*mongo.DeleteResult, error)
 }
 
-type ItemCollection struct {
+type itemService struct {
 	collection *mongo.Collection
 }
 
 func New(collection *mongo.Collection) ItemService {
-	return &ItemCollection{
+	return &itemService{
 		collection: collection,
 	}
 }
 
-func (c *ItemCollection) AddItem(item models.Items, result *models.Items) error {
+func (s *itemService) InsertItem(item models.Items) (*mongo.InsertOneResult, error) {
+	return nil, nil
+}
+
+func (s *itemService) GetItem(id string) *mongo.SingleResult {
 	return nil
 }
 
-func (c *ItemCollection) GetItem() {}
+func (s *itemService) UpdateItem(id string, item models.Items) (*mongo.UpdateResult, error) {
+	return nil, nil
+}
 
-func (c *ItemCollection) UpdateItem() {}
-
-func (c *ItemCollection) DeleteItem() {}
+func (s *itemService) DeleteItem(id string) (*mongo.DeleteResult, error) {
+	return nil, nil
+}
