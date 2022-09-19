@@ -51,5 +51,8 @@ func (s *itemService) UpdateItem(id string, item models.Items) (*mongo.UpdateRes
 }
 
 func (s *itemService) DeleteItem(id string) (*mongo.DeleteResult, error) {
-	return nil, nil
+	docId, _ := primitive.ObjectIDFromHex(id)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancelFunc()
+	return s.collection.DeleteOne(ctx, bson.M{"_id": docId})
 }
