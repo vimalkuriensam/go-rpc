@@ -2,8 +2,11 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"net/http"
 
 	"github.com/vimalkuriensam/broker-service/pkg/config"
+	"github.com/vimalkuriensam/broker-service/pkg/routes"
 )
 
 const DEFAULT_ENV = "development"
@@ -15,5 +18,7 @@ func main() {
 	flag.Parse()
 	cfg := config.Init()
 	cfg.LoadEnvironment(env)
-
+	routes := routes.Routes()
+	cfg.Logger.Printf("Server is running on port %v", cfg.Env["port"])
+	cfg.Logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", cfg.Env["port"]), routes))
 }
