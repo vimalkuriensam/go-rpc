@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+
+  broker-service:
+    user: 10001:10001
+    build: 
+      context: ../
+      dockerfile: ./deployment/Dockerfile.prod
+    command:
+      - -envflag=production
+    env_file:
+      - ../environment/production.env
+    restart: always
+    ports:
+      - 8080:80
+    deploy:
+      mode: replicated
+      replicas: 1
