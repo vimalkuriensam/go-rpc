@@ -11,7 +11,7 @@ services:
       - ../environment/production.env
     restart: always
     ports:
-      - 8080:80
+      - 4040:4040
     deploy:
       mode: replicated
       replicas: 1

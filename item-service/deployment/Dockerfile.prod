@@ -1,7 +1,7 @@
 # creating a multistage docker file
 # Initial stage being the builder stage
 FROM golang:alpine as BUILDER-STAGE
-RUN apk update && add --no-cache git ca-certificates tz-data && update-ca-certificates
+RUN apk update && apk add --no-cache git ca-certificates tzdata && update-ca-certificates
 ENV USER=appuser
 ENV UID=10001
 WORKDIR /app
@@ -24,7 +24,7 @@ FROM scratch as DEPLOYER-STAGE
 WORKDIR /app
 COPY --from=BUILDER-STAGE /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=BUILDER-STAGE /usr/share/zoneinfo /usr/share/zoneinfo
-COPY --from=BUIDER-STAGE /app/itemServiceApp /app/
+COPY --from=BUILDER-STAGE /app/itemServiceApp /app/
 USER appuser:appuser
-EXPOSE 80
+EXPOSE 4040
 ENTRYPOINT ["/app/itemServiceApp"]
