@@ -11,8 +11,8 @@ import (
 type ItemService interface {
 	AddItem(models.Items, *config.JSONResponse) error
 	GetItem(string, *config.JSONResponse) error
-	UpdateItem()
-	DeleteItem()
+	UpdateItem(models.Items, *config.JSONResponse) error
+	DeleteItem(string, *config.JSONResponse) error
 }
 
 type ItemCollection struct {
@@ -46,6 +46,28 @@ func (c *ItemCollection) GetItem(id string, result *config.JSONResponse) error {
 	return nil
 }
 
-func (c *ItemCollection) UpdateItem() {}
+func (c *ItemCollection) UpdateItem(item models.Items, result *config.JSONResponse) error {
+	return nil
+}
 
-func (c *ItemCollection) DeleteItem() {}
+func (c *ItemCollection) DeleteItem(id string, result *config.JSONResponse) error {
+	var (
+		itemResp *config.JSONResponse
+		item     models.Items
+	)
+	err := c.GetItem(id, itemResp)
+	if err != nil {
+		return err
+	}
+	item = itemResp.Data.(models.Items)
+	deleteResp, err := c.services.DeleteItem(id)
+	if err != nil {
+		return err
+	}
+	result.Message = fmt.Sprintf("Item with id %v deleted successfully", id)
+	result.Data = models.DeleteItem{
+		DeleteCount: int(deleteResp.DeletedCount),
+		Item:        item,
+	}
+	return nil
+}

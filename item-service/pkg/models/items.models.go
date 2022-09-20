@@ -13,3 +13,8 @@ type Items struct {
 	CreatedAt time.Time          `json:"createdAt" bson:"created_at"`
 	UpdatedAt time.Time          `json:"updatedAt" bson:"updated_at"`
 }
+
+type DeleteItem struct {
+	DeleteCount int   `json:"deleteCount"`
+	Item        Items `json:"item"`
+}
