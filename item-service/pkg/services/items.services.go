@@ -11,10 +11,10 @@ import (
 )
 
 type ItemService interface {
-	InsertItem(models.Items) (*mongo.InsertOneResult, error)
-	GetItem(string) *mongo.SingleResult
-	UpdateItem(string, models.Items) (*mongo.UpdateResult, error)
-	DeleteItem(string) (*mongo.DeleteResult, error)
+	InsertItemCollection(models.Items) (*mongo.InsertOneResult, error)
+	GetItemCollection(string) *mongo.SingleResult
+	UpdateItemCollection(string, models.Items) (*mongo.UpdateResult, error)
+	DeleteItemCollection(string) (*mongo.DeleteResult, error)
 }
 
 type itemService struct {
@@ -27,7 +27,7 @@ func New(collection *mongo.Collection) ItemService {
 	}
 }
 
-func (s *itemService) InsertItem(item models.Items) (*mongo.InsertOneResult, error) {
+func (s *itemService) InsertItemCollection(item models.Items) (*mongo.InsertOneResult, error) {
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancelFunc()
 	newItem := bson.D{
@@ -39,14 +39,14 @@ func (s *itemService) InsertItem(item models.Items) (*mongo.InsertOneResult, err
 	return s.collection.InsertOne(ctx, newItem)
 }
 
-func (s *itemService) GetItem(id string) *mongo.SingleResult {
+func (s *itemService) GetItemCollection(id string) *mongo.SingleResult {
 	docId, _ := primitive.ObjectIDFromHex(id)
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancelFunc()
 	return s.collection.FindOne(ctx, bson.M{"_id": docId})
 }
 
-func (s *itemService) UpdateItem(id string, item models.Items) (*mongo.UpdateResult, error) {
+func (s *itemService) UpdateItemCollection(id string, item models.Items) (*mongo.UpdateResult, error) {
 	docId, _ := primitive.ObjectIDFromHex(id)
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancelFunc()
@@ -59,7 +59,7 @@ func (s *itemService) UpdateItem(id string, item models.Items) (*mongo.UpdateRes
 	})
 }
 
-func (s *itemService) DeleteItem(id string) (*mongo.DeleteResult, error) {
+func (s *itemService) DeleteItemCollection(id string) (*mongo.DeleteResult, error) {
 	docId, _ := primitive.ObjectIDFromHex(id)
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancelFunc()

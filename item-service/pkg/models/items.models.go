@@ -18,3 +18,15 @@ type DeleteItem struct {
 	DeleteCount int   `json:"deleteCount"`
 	Item        Items `json:"item"`
 }
+
+type UpdateItemInput struct {
+	ID         string
+	UpdateItem Items
+}
+
+type UpdateItemResponse struct {
+	ID          string `json:"id"`
+	Count       int    `json:"count"`
+	PriorItem   Items  `json:"priorItem"`
+	UpdatedItem Items  `json:"updatedItem"`
+}

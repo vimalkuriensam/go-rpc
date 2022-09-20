@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/vimalkuriensam/item-service/pkg/config"
 	"github.com/vimalkuriensam/item-service/pkg/models"
@@ -11,7 +12,7 @@ import (
 type ItemService interface {
 	AddItem(models.Items, *config.JSONResponse) error
 	GetItem(string, *config.JSONResponse) error
-	UpdateItem(models.Items, *config.JSONResponse) error
+	UpdateItem(models.UpdateItemInput, *config.JSONResponse) error
 	DeleteItem(string, *config.JSONResponse) error
 }
 
@@ -26,7 +27,7 @@ func New(services services.ItemService) ItemService {
 }
 
 func (c *ItemCollection) AddItem(item models.Items, result *config.JSONResponse) error {
-	id, err := c.services.InsertItem(item)
+	id, err := c.services.InsertItemCollection(item)
 	if err != nil {
 		return err
 	}
@@ -37,7 +38,7 @@ func (c *ItemCollection) AddItem(item models.Items, result *config.JSONResponse)
 
 func (c *ItemCollection) GetItem(id string, result *config.JSONResponse) error {
 	var item models.ItemModel
-	err := c.services.GetItem(id).Decode(&item)
+	err := c.services.GetItemCollection(id).Decode(&item)
 	if err != nil {
 		return err
 	}
@@ -46,7 +47,34 @@ func (c *ItemCollection) GetItem(id string, result *config.JSONResponse) error {
 	return nil
 }
 
-func (c *ItemCollection) UpdateItem(item models.Items, result *config.JSONResponse) error {
+func (c *ItemCollection) UpdateItem(updates models.UpdateItemInput, result *config.JSONResponse) error {
+	var (
+		priorItem   models.Items
+		updatedItem models.Items
+		itemResp    *config.JSONResponse
+	)
+	err := c.GetItem(updates.ID, itemResp)
+	if err != nil {
+		return err
+	}
+	priorItem = itemResp.Data.(models.Items)
+	updates.UpdateItem.UpdatedAt = time.Now()
+	response, err := c.services.UpdateItemCollection(updates.ID, updates.UpdateItem)
+	if err != nil {
+		return err
+	}
+	err = c.GetItem(updates.ID, itemResp)
+	if err != nil {
+		return err
+	}
+	updatedItem = itemResp.Data.(models.Items)
+	result.Message = fmt.Sprintf("Item with id %v updated successfully", updates.ID)
+	result.Data = models.UpdateItemResponse{
+		ID:          updates.ID,
+		Count:       int(response.ModifiedCount),
+		PriorItem:   priorItem,
+		UpdatedItem: updatedItem,
+	}
 	return nil
 }
 
@@ -60,7 +88,7 @@ func (c *ItemCollection) DeleteItem(id string, result *config.JSONResponse) erro
 		return err
 	}
 	item = itemResp.Data.(models.Items)
-	deleteResp, err := c.services.DeleteItem(id)
+	deleteResp, err := c.services.DeleteItemCollection(id)
 	if err != nil {
 		return err
 	}
