@@ -10,6 +10,7 @@ import (
 	"github.com/vimalkuriensam/item-service/pkg/config"
 	"github.com/vimalkuriensam/item-service/pkg/models"
 	itemrpc "github.com/vimalkuriensam/item-service/pkg/rpc"
+	"github.com/vimalkuriensam/item-service/pkg/services"
 )
 
 const DEFAULT_ENVIRONMENT = "development"
@@ -33,7 +34,8 @@ func main() {
 	}
 	defer db.Disconnect()
 	db.InsertMongoCollections("items")
-	itemCollection := new(itemrpc.ItemCollection)
+	itemService := services.New(cfg.Database.Collections["items"])
+	itemCollection := itemrpc.New(itemService)
 	if err := rpc.Register(itemCollection); err != nil {
 		cfg.Logger.Fatal(err)
 	}

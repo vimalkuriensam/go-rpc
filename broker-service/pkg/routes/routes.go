@@ -32,5 +32,6 @@ func Routes() http.Handler {
 	mux.Use(middleware.Timeout(2500 * time.Millisecond))
 	mux.Use(middleware.Throttle(1))
 	mux.Use(httprate.LimitByIP(100, 1*time.Minute))
+	mux.Route("/api/v1/items", itemRoutes)
 	return mux
 }
