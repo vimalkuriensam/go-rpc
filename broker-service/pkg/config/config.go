@@ -13,6 +13,7 @@ import (
 )
 
 type Config struct {
+	DataChan      chan any
 	Env           map[string]any
 	Logger        *log.Logger
 	Response      *JSONResponse
@@ -30,6 +31,11 @@ type ErrorResponse struct {
 	Path      string    `json:"path"`
 	Reason    string    `json:"reasone"`
 	Timestamp time.Time `json:"timeStamp"`
+}
+
+type ReadValue struct {
+	B []byte
+	D interface{}
 }
 
 var cfg *Config
@@ -54,6 +60,7 @@ func (config *Config) ConnectRPC() error {
 	if err != nil {
 		return err
 	}
+	config.Logger.Printf("Connected to rpc server on port %v", config.Env["rpcport"])
 	cfg.Client = client
 	return nil
 }

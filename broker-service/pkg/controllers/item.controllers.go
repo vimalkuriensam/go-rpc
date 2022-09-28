@@ -23,7 +23,9 @@ func New() ItemController {
 	}
 }
 
-func (c *itemController) AddItem(w http.ResponseWriter, res *http.Request) {}
+func (c *itemController) AddItem(w http.ResponseWriter, res *http.Request) {
+
+}
 
 func (c *itemController) GetItem(w http.ResponseWriter, res *http.Request) {}
 
