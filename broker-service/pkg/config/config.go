@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
+	"net/rpc"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +17,7 @@ type Config struct {
 	Logger        *log.Logger
 	Response      *JSONResponse
 	ErrorResponse *ErrorResponse
+	Client        *rpc.Client
 }
 
 type JSONResponse struct {
@@ -38,12 +40,22 @@ func Init() *Config {
 		Logger:        log.New(os.Stdout, "", log.Ldate|log.Ltime),
 		Response:      &JSONResponse{},
 		ErrorResponse: &ErrorResponse{},
+		Client:        &rpc.Client{},
 	}
 	return cfg
 }
 
 func GetConfig() *Config {
 	return cfg
+}
+
+func (config *Config) ConnectRPC() error {
+	client, err := rpc.DialHTTP("tcp", fmt.Sprintf(":%v", config.Env["rpcport"]))
+	if err != nil {
+		return err
+	}
+	cfg.Client = client
+	return nil
 }
 
 func (config *Config) LoadEnvironment(envStatus string) error {

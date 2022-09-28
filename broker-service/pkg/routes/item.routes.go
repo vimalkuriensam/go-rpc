@@ -5,7 +5,7 @@ import (
 	"github.com/vimalkuriensam/broker-service/pkg/controllers"
 )
 
-var itemController controllers.ItemController = controllers.Init()
+var itemController controllers.ItemController = controllers.New()
 
 func itemRoutes(r chi.Router) {
 	r.Post("/addItem", itemController.AddItem)

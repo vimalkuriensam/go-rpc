@@ -18,6 +18,10 @@ func main() {
 	flag.Parse()
 	cfg := config.Init()
 	cfg.LoadEnvironment(env)
+	if err := cfg.ConnectRPC(); err != nil {
+		cfg.Logger.Fatalf("could not connect to rpc port %v", cfg.Env["rpcport"])
+
+	}
 	routes := routes.Routes()
 	cfg.Logger.Printf("Server is running on port %v", cfg.Env["port"])
 	cfg.Logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", cfg.Env["port"]), routes))

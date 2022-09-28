@@ -17,7 +17,7 @@ type itemController struct {
 	config *config.Config
 }
 
-func Init() ItemController {
+func New() ItemController {
 	return &itemController{
 		config: config.GetConfig(),
 	}
