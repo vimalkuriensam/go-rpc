@@ -34,7 +34,7 @@ func main() {
 	}
 	defer db.Disconnect()
 	db.InsertMongoCollections("items")
-	itemService := services.New(cfg.Database.Collections["items"])
+	itemService := services.New()
 	itemCollection := itemrpc.New(itemService)
 	if err := rpc.Register(itemCollection); err != nil {
 		cfg.Logger.Fatal(err)

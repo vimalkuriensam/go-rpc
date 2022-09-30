@@ -42,6 +42,7 @@ var cfg *Config
 
 func Init() *Config {
 	cfg = &Config{
+		DataChan:      make(chan any),
 		Env:           make(map[string]any),
 		Logger:        log.New(os.Stdout, "", log.Ldate|log.Ltime),
 		Response:      &JSONResponse{},

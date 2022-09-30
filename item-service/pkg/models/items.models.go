@@ -12,6 +12,15 @@ type Items struct {
 	Value     int                `json:"value" bson:"value"`
 	CreatedAt time.Time          `json:"createdAt" bson:"created_at"`
 	UpdatedAt time.Time          `json:"updatedAt" bson:"updated_at"`
+	StringID  string             `json:"stringId"`
+}
+
+type ItemRPC struct {
+	ID        string    `json:"id,omitempty"`
+	Name      string    `json:"name" bson:"name"`
+	Value     int       `json:"value" bson:"value"`
+	CreatedAt time.Time `json:"createdAt" bson:"created_at"`
+	UpdatedAt time.Time `json:"updatedAt" bson:"updated_at"`
 }
 
 type DeleteItem struct {

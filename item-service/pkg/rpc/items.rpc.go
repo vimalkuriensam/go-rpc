@@ -1,12 +1,14 @@
 package rpc
 
 import (
+	"bytes"
 	"fmt"
 	"time"
 
 	"github.com/vimalkuriensam/item-service/pkg/config"
 	"github.com/vimalkuriensam/item-service/pkg/models"
 	"github.com/vimalkuriensam/item-service/pkg/services"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ItemService interface {
@@ -26,13 +28,28 @@ func New(services services.ItemService) ItemService {
 	}
 }
 
+type DataToSend struct {
+	Name  string `json:"name"`
+	Value int    `json:"value"`
+}
+
 func (c *ItemCollection) AddItem(item models.Items, result *config.JSONResponse) error {
+	var insertedItem models.Items
+	var b bytes.Buffer
 	id, err := c.services.InsertItemCollection(item)
 	if err != nil {
 		return err
 	}
-	result.Message = fmt.Sprintf("Item with id %v created", id.InsertedID)
-	result.Data = item
+	stringId := id.InsertedID.(primitive.ObjectID).Hex()
+	result.Message = fmt.Sprintf("Item with id %v created", stringId)
+	if err = c.services.GetItemCollection(stringId).Decode(&insertedItem); err != nil {
+		return err
+	}
+	insertedItem.StringID = stringId
+	if err := services.EncodeData(insertedItem, &b); err != nil {
+		return err
+	}
+	result.Data = b.Bytes()
 	return nil
 }
 
