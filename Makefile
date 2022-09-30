@@ -1,5 +1,6 @@
 #  Binary file name
 BROKER_BINARY=brokerApp
+ITEM_BINARY=itemApp
 
 #  Starting all docker containers from docker compose file
 up:
@@ -25,5 +26,11 @@ down:
 # Creating the binary file for the item-service
 build_item_search:
 	@echo "Building item search binary"
-	cd ./item-service && go build -o ../bin/${BROKER_BINARY} ./cmd/api/.
+	cd ./item-service && go build -o ../bin/${ITEM_BINARY} ./cmd/api/.
+	@echo "Done"
+
+# Creating the binary file for the broker-service
+build_item_search:
+	@echo "Building broker service binary"
+	cd ./broker-service && go build -o ../bin/${BROKER_BINARY} ./cmd/api/.
 	@echo "Done"

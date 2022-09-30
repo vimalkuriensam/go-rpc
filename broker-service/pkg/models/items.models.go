@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+var ItemAcceptableFields = map[string][]string{
+	"create": {"item", "value"},
+	"update": {"item", "value"},
+}
+
 type Items struct {
 	StringID  string    `json:"id"`
 	Name      string    `json:"name"`

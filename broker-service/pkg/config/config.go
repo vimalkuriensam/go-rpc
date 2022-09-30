@@ -57,7 +57,7 @@ func GetConfig() *Config {
 }
 
 func (config *Config) ConnectRPC() error {
-	client, err := rpc.DialHTTP("tcp", fmt.Sprintf(":%v", config.Env["rpcport"]))
+	client, err := rpc.DialHTTP("tcp", fmt.Sprintf("%v", config.Env["rpcport"]))
 	if err != nil {
 		return err
 	}

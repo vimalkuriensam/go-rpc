@@ -1,4 +1,4 @@
 */environment/
-*/**/deployment/db-data
+**db-data/
 /bin/
 */tmp

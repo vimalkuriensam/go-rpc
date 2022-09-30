@@ -1,5 +1,22 @@
 version: '3.8'
 services:
+
+  broker-service:
+    user: 10001:10001
+    build: 
+      context: ../broker-service
+      dockerfile: ./deployment/Dockerfile.prod
+    command:
+      - -envflag=production
+    env_file:
+      - ./environment/broker-service.prod.env
+    restart: always
+    ports:
+      - 8080:80
+    deploy:
+      mode: replicated
+      replicas: 1
+
   items-service:
     user: 10001:10001
     build: 
@@ -17,6 +34,8 @@ services:
       replicas: 1
     depends_on:
       - mongo-service
+      - broker-service
+      
   mongo-service:
     image: mongo:latest
     container_name: mongodb

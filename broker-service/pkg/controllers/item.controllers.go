@@ -8,6 +8,7 @@ import (
 
 	"github.com/vimalkuriensam/broker-service/pkg/config"
 	"github.com/vimalkuriensam/broker-service/pkg/models"
+	"github.com/vimalkuriensam/broker-service/pkg/services"
 )
 
 type ItemController interface {
@@ -17,16 +18,22 @@ type ItemController interface {
 	DeleteItem(http.ResponseWriter, *http.Request)
 }
 
-type itemController struct{}
+type itemController struct {
+	fields map[string][]string
+}
 
 func New() ItemController {
-	return &itemController{}
+	return &itemController{
+		fields: models.ItemAcceptableFields,
+	}
 }
 
 func (c *itemController) AddItem(w http.ResponseWriter, req *http.Request) {
 	cfg := config.GetConfig()
-	go cfg.ReadJSON(req)
-	data := (<-cfg.DataChan).(config.ReadValue)
+	data, err := services.ReadRequest(req, c.fields["create"])
+	if err != nil {
+		cfg.ErrorJSON(w, req.URL.Path, err.Error(), http.StatusBadRequest)
+	}
 	item := models.Items{}
 	json.Unmarshal(data.B, &item)
 	reply := config.JSONResponse{}
@@ -40,7 +47,9 @@ func (c *itemController) AddItem(w http.ResponseWriter, req *http.Request) {
 	cfg.WriteJSON(w, http.StatusCreated, reply.Data, reply.Message)
 }
 
-func (c *itemController) GetItem(w http.ResponseWriter, res *http.Request) {}
+func (c *itemController) GetItem(w http.ResponseWriter, res *http.Request) {
+
+}
 
 func (c *itemController) UpdateItem(w http.ResponseWriter, res *http.Request) {}
 
