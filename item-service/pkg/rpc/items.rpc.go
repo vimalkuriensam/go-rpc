@@ -86,6 +86,8 @@ func (c *ItemCollection) UpdateItem(updates models.UpdateItemInput, result *conf
 	}
 	updatedItem = itemResp.Data.(models.Items)
 	result.Message = fmt.Sprintf("Item with id %v updated successfully", updates.ID)
+	priorItem.StringID = updates.ID
+	updatedItem.StringID = updates.ID
 	result.Data = models.UpdateItemResponse{
 		ID:          updates.ID,
 		Count:       int(response.ModifiedCount),

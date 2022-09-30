@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/vimalkuriensam/broker-service/pkg/config"
 	"github.com/vimalkuriensam/broker-service/pkg/models"
 	"github.com/vimalkuriensam/broker-service/pkg/services"
@@ -47,10 +48,52 @@ func (c *itemController) AddItem(w http.ResponseWriter, req *http.Request) {
 	cfg.WriteJSON(w, http.StatusCreated, reply.Data, reply.Message)
 }
 
-func (c *itemController) GetItem(w http.ResponseWriter, res *http.Request) {
-
+func (c *itemController) GetItem(w http.ResponseWriter, req *http.Request) {
+	item := models.Items{}
+	reply := config.JSONResponse{}
+	cfg := config.GetConfig()
+	id := chi.URLParam(req, "id")
+	if len(id) == 0 {
+		cfg.ErrorJSON(w, req.URL.Path, "user id is not provided", http.StatusBadRequest)
+	}
+	if err := cfg.Client.Call("ItemCollection.GetItem", item, &reply); err != nil {
+		cfg.ErrorJSON(w, req.URL.Path, err.Error(), http.StatusInternalServerError)
+	}
+	if err := gob.NewDecoder(bytes.NewBuffer(reply.Data.([]byte))).Decode(&item); err != nil {
+		cfg.ErrorJSON(w, req.URL.Path, err.Error(), http.StatusInternalServerError)
+	}
+	reply.Data = item
+	cfg.WriteJSON(w, http.StatusCreated, reply.Data, reply.Message)
 }
 
-func (c *itemController) UpdateItem(w http.ResponseWriter, res *http.Request) {}
+func (c *itemController) UpdateItem(w http.ResponseWriter, req *http.Request) {
+	item := models.Items{}
+	reply := config.JSONResponse{}
+	cfg := config.GetConfig()
+	id := chi.URLParam(req, "id")
+	if len(id) == 0 {
+		cfg.ErrorJSON(w, req.URL.Path, "user id is not provided", http.StatusBadRequest)
+	}
+	data, err := services.ReadRequest(req, c.fields["update"])
+	if err != nil {
+		cfg.ErrorJSON(w, req.URL.Path, err.Error(), http.StatusBadRequest)
+	}
+	if err := json.Unmarshal(data.B, &item); err != nil {
+		cfg.ErrorJSON(w, req.URL.Path, err.Error(), http.StatusInternalServerError)
+	}
+	updateInput := &models.UpdateItemInput{
+		ID:         id,
+		UpdateItem: item,
+	}
+	updateResult := models.UpdateItemResponse{}
+	if err := cfg.Client.Call("ItemCollection.GetItem", updateInput, &reply); err != nil {
+		cfg.ErrorJSON(w, req.URL.Path, err.Error(), http.StatusInternalServerError)
+	}
+	if err := gob.NewDecoder(bytes.NewBuffer(reply.Data.([]byte))).Decode(&updateResult); err != nil {
+		cfg.ErrorJSON(w, req.URL.Path, err.Error(), http.StatusInternalServerError)
+	}
+	reply.Data = updateResult
+	cfg.WriteJSON(w, http.StatusCreated, reply.Data, reply.Message)
+}
 
 func (c *itemController) DeleteItem(w http.ResponseWriter, req *http.Request) {}
