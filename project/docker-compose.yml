@@ -27,8 +27,6 @@ services:
     env_file:
       - ./environment/item-service.prod.env
     restart: always
-    ports:
-      - 4040:4040
     deploy:
       mode: replicated
       replicas: 1

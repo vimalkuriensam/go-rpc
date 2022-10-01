@@ -5,8 +5,8 @@ import (
 )
 
 var ItemAcceptableFields = map[string][]string{
-	"create": {"item", "value"},
-	"update": {"item", "value"},
+	"create": {"name", "value"},
+	"update": {"name", "value"},
 }
 
 type Items struct {
@@ -27,4 +27,9 @@ type UpdateItemResponse struct {
 	Count       int    `json:"count"`
 	PriorItem   Items  `json:"priorItem"`
 	UpdatedItem Items  `json:"updatedItem"`
+}
+
+type DeleteItem struct {
+	DeleteCount int   `json:"deleteCount"`
+	Item        Items `json:"item"`
 }

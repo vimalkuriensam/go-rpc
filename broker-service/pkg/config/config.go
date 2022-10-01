@@ -29,7 +29,7 @@ type JSONResponse struct {
 type ErrorResponse struct {
 	Code      int       `json:"errorCode"`
 	Path      string    `json:"path"`
-	Reason    string    `json:"reasone"`
+	Reason    string    `json:"reason"`
 	Timestamp time.Time `json:"timeStamp"`
 }
 

@@ -3,7 +3,6 @@ package rpc
 import (
 	"bytes"
 	"fmt"
-	"time"
 
 	"github.com/vimalkuriensam/item-service/pkg/config"
 	"github.com/vimalkuriensam/item-service/pkg/models"
@@ -54,13 +53,18 @@ func (c *ItemCollection) AddItem(item models.Items, result *config.JSONResponse)
 }
 
 func (c *ItemCollection) GetItem(id string, result *config.JSONResponse) error {
-	var item models.ItemModel
+	item := models.Items{}
+	var b bytes.Buffer
 	err := c.services.GetItemCollection(id).Decode(&item)
 	if err != nil {
 		return err
 	}
 	result.Message = fmt.Sprintf("item with id %v fetched.", id)
-	result.Data = item
+	item.StringID = id
+	if err := services.EncodeData(item, &b); err != nil {
+		return err
+	}
+	result.Data = b.Bytes()
 	return nil
 }
 
@@ -68,23 +72,18 @@ func (c *ItemCollection) UpdateItem(updates models.UpdateItemInput, result *conf
 	var (
 		priorItem   models.Items
 		updatedItem models.Items
-		itemResp    *config.JSONResponse
+		b           bytes.Buffer
 	)
-	err := c.GetItem(updates.ID, itemResp)
-	if err != nil {
+	if err := c.services.GetItemCollection(updates.ID).Decode(&priorItem); err != nil {
 		return err
 	}
-	priorItem = itemResp.Data.(models.Items)
-	updates.UpdateItem.UpdatedAt = time.Now()
 	response, err := c.services.UpdateItemCollection(updates.ID, updates.UpdateItem)
 	if err != nil {
 		return err
 	}
-	err = c.GetItem(updates.ID, itemResp)
-	if err != nil {
+	if err := c.services.GetItemCollection(updates.ID).Decode(&updatedItem); err != nil {
 		return err
 	}
-	updatedItem = itemResp.Data.(models.Items)
 	result.Message = fmt.Sprintf("Item with id %v updated successfully", updates.ID)
 	priorItem.StringID = updates.ID
 	updatedItem.StringID = updates.ID
@@ -94,27 +93,35 @@ func (c *ItemCollection) UpdateItem(updates models.UpdateItemInput, result *conf
 		PriorItem:   priorItem,
 		UpdatedItem: updatedItem,
 	}
+	if err := services.EncodeData(result.Data, &b); err != nil {
+		return err
+	}
+	result.Data = b.Bytes()
 	return nil
 }
 
 func (c *ItemCollection) DeleteItem(id string, result *config.JSONResponse) error {
 	var (
-		itemResp *config.JSONResponse
-		item     models.Items
+		item models.Items
+		b    bytes.Buffer
 	)
-	err := c.GetItem(id, itemResp)
+	err := c.services.GetItemCollection(id).Decode(&item)
 	if err != nil {
 		return err
 	}
-	item = itemResp.Data.(models.Items)
 	deleteResp, err := c.services.DeleteItemCollection(id)
 	if err != nil {
 		return err
 	}
 	result.Message = fmt.Sprintf("Item with id %v deleted successfully", id)
+	item.StringID = id
 	result.Data = models.DeleteItem{
 		DeleteCount: int(deleteResp.DeletedCount),
 		Item:        item,
 	}
+	if err := services.EncodeData(result.Data, &b); err != nil {
+		return err
+	}
+	result.Data = b.Bytes()
 	return nil
 }
