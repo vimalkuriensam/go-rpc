@@ -8,11 +8,13 @@ message LogsRequest {
     int32 timeStamp = 1;
     string message = 2;
     string ipAddr = 3;
-    enum status {
-        INFO = 0;
-        WARNING = 1;
-        ERROR = 2;
-    }
+    Status status = 4;
+}
+
+enum Status {
+    INFO = 0;
+    WARNING = 1;
+    ERROR = 2;
 }
 
 message LogsResponse{
