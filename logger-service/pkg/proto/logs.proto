@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/vimalkuriensam/logger-service/pkg/proto";
+
+message LogsRequest {
+    int32 timeStamp = 1;
+    string message = 2;
+    string ipAddr = 3;
+    enum status {
+        INFO = 0;
+        WARNING = 1;
+        ERROR = 2;
+    }
+}
+
+message LogsResponse{
+    bool error = 1;
+    string message = 2;
+}
+
+service LogsService {
+    rpc AddLogs(LogsRequest) returns (LogsResponse);
+}
